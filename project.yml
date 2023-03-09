@@ -1,0 +1,75 @@
+title: "Train pipelines on LitBank."
+
+directories: ["configs", "assets", "corpus", "training", "scripts"]
+assets:
+  - dest: "assets/entities/"
+    git:
+      repo: "https://github.com/dbamman/litbank"
+      branch: "master"
+      path: "entities/brat/"
+
+vars:
+  train_ratio: 0.8
+  dev_ratio: 0.1
+  seed: 833
+  gpu: 0
+
+commands:
+  - name: "prepare-entities"
+    help: "Prepare the LitBank data set for use in spaCy."
+    script:
+      - >-
+        python -m scripts.prepare prepare-brat -i assets/entities
+        -o corpus/entity_spans.spacy -l en -f
+      - >-
+        python -m scripts.prepare spans2ents -i corpus/entity_spans.spacy
+        -l en -f -s sc -o corpus/entity_ents.spacy
+      - >- 
+        python -m scripts.prepare split -i corpus/entity_spans.spacy
+        -t ${vars.train_ratio} -d ${vars.dev_ratio}
+        -l en -se ${vars.seed} --shuffle
+      - >- 
+        python -m scripts.prepare split -i corpus/entity_ents.spacy
+        -t ${vars.train_ratio} -d ${vars.dev_ratio}
+        -l en -se ${vars.seed} --shuffle
+      - >-
+        python -m spacy debug data configs/ner.cfg
+        --paths.train corpus/entity_ents-train.spacy
+        --paths.dev corpus/entity_ents-dev.spacy
+      - >-
+        python -m spacy debug data configs/spancat.cfg
+        --paths.train corpus/entity_spans-train.spacy
+        --paths.dev corpus/entity_spans-dev.spacy
+
+
+  - name: "download-models"
+    help: "Download spaCy models."
+    script:
+      - "python -m spacy download en_core_web_lg"
+      - "python -m spacy download en_core_web_trf"
+
+
+  - name: "train-ner"
+    help: "Train the default NER pipeline."
+    script:
+      - >-
+        python -m spacy train
+        configs/ner.cfg
+        --output training/ner
+        --paths.train corpus/entity_ents-train.spacy
+        --paths.dev corpus/entity_ents-dev.spacy
+        --system.seed ${vars.seed}
+        --gpu-id ${vars.gpu}
+
+
+  - name: "train-spancat"
+    help: "Train the default spancat pipeline."
+    script:
+      - >-
+        python -m spacy train
+        configs/spancat.cfg
+        --output training/spancat
+        --paths.train corpus/entity_spans-train.spacy
+        --paths.dev corpus/entity_spans-dev.spacy
+        --system.seed ${vars.seed}
+        --gpu-id ${vars.gpu}
