@@ -1,6 +1,6 @@
 title: "Train pipelines on LitBank."
 
-directories: ["configs", "assets", "corpus", "training", "scripts"]
+directories: ["configs", "assets", "corpus", "training", "scripts", "metrics"]
 assets:
   - dest: "assets/entities/"
     git:
@@ -71,5 +71,50 @@ commands:
         --output training/spancat
         --paths.train corpus/entity_spans-train.spacy
         --paths.dev corpus/entity_spans-dev.spacy
+        --paths.vectors en_core_web_lg
         --system.seed ${vars.seed}
+        --gpu-id ${vars.gpu}
+
+
+  - name: "evaluate-ner-dev"
+    help: "Evaluate NER model."
+    script:
+      - >-
+        python -m spacy evaluate
+        training/ner/model-best
+        corpus/entity_ents-dev.spacy
+        --output metrics/ner_dev.json
+        --gpu-id ${vars.gpu}
+
+
+  - name: "evaluate-ner-test"
+    help: "Evaluate NER model."
+    script:
+      - >-
+        python -m spacy evaluate
+        training/ner/model-best
+        corpus/entity_ents-test.spacy
+        --output metrics/ner_test.json
+        --gpu-id ${vars.gpu}
+
+
+  - name: "evaluate-spancat-dev"
+    help: "Evaluate NER model."
+    script:
+      - >-
+        python -m spacy evaluate
+        training/spancat/model-best
+        corpus/entity_spans-dev.spacy
+        --output metrics/spancat_dev.json
+        --gpu-id ${vars.gpu}
+
+
+  - name: "evaluate-spancat-test"
+    help: "Evaluate NER model."
+    script:
+      - >-
+        python -m spacy evaluate
+        training/spancat/model-best
+        corpus/entity_spans-test.spacy
+        --output metrics/spancat_test.json
         --gpu-id ${vars.gpu}
