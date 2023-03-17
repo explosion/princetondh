@@ -14,6 +14,25 @@ vars:
   seed: 833
   gpu: 0
 
+
+workflows:
+  setup:
+    - "prepare-entities"
+    - "download-models"
+  
+  ner:
+    - "train-ner"
+    - "evaluate-ner-test"
+
+  spancat:
+    - "train-spancat"
+    - "evaluate-spancat-test"
+
+  spancat-singlelabel:
+    - "train-spancat-singlelabel"
+    - "evaluate-spancat-singlelabel-test"
+
+
 commands:
   - name: "prepare-entities"
     help: "Prepare the LitBank data set for use in spaCy."
@@ -75,6 +94,27 @@ commands:
         --system.seed ${vars.seed}
         --gpu-id ${vars.gpu}
 
+  - name: "find-threshold"
+    help: "Find classifier threshold for spancat."
+    script:
+      - >- 
+        python -m spacy find-threshold training/spancat/model-best
+        corpus/entity_spans-dev.spacy spancat threshold spans_sc_f
+
+
+  - name: "train-spancat-singlelabel"
+    help: "Train the default spancat pipeline."
+    script:
+      - >-
+        python -m spacy train
+        configs/spancat_singlelabel.cfg
+        --output training/spancat_singlelabel
+        --paths.train corpus/entity_spans-train.spacy
+        --paths.dev corpus/entity_spans-dev.spacy
+        --paths.vectors en_core_web_lg
+        --system.seed ${vars.seed}
+        --gpu-id ${vars.gpu}
+
 
   - name: "evaluate-ner-dev"
     help: "Evaluate NER model."
@@ -115,6 +155,28 @@ commands:
       - >-
         python -m spacy evaluate
         training/spancat/model-best
+        corpus/entity_spans-test.spacy
+        --output metrics/spancat_test.json
+        --gpu-id ${vars.gpu}
+
+
+  - name: "evaluate-spancat-singlelabel-dev"
+    help: "Evaluate NER model."
+    script:
+      - >-
+        python -m spacy evaluate
+        training/spancat/model-best
+        corpus/entity_spans-dev.spacy
+        --output metrics/spancat_dev.json
+        --gpu-id ${vars.gpu}
+
+
+  - name: "evaluate-spancat-singlelabel-test"
+    help: "Evaluate NER model."
+    script:
+      - >-
+        python -m spacy evaluate
+        training/spancat_singlelabel/model-best
         corpus/entity_spans-test.spacy
         --output metrics/spancat_test.json
         --gpu-id ${vars.gpu}
