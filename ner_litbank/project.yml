@@ -16,9 +16,6 @@ vars:
 
 
 workflows:
-  setup:
-    - "prepare-entities"
-    - "download-models"
   
   ner:
     - "train-ner"
@@ -34,7 +31,7 @@ workflows:
 
 
 commands:
-  - name: "prepare-entities"
+  - name: "prepare"
     help: "Prepare the LitBank data set for use in spaCy."
     script:
       - >-
@@ -52,20 +49,9 @@ commands:
         -t ${vars.train_ratio} -d ${vars.dev_ratio}
         -l en -se ${vars.seed} --shuffle
       - >-
-        python -m spacy debug data configs/ner.cfg
-        --paths.train corpus/entity_ents-train.spacy
-        --paths.dev corpus/entity_ents-dev.spacy
-      - >-
         python -m spacy debug data configs/spancat.cfg
         --paths.train corpus/entity_spans-train.spacy
         --paths.dev corpus/entity_spans-dev.spacy
-
-
-  - name: "download-models"
-    help: "Download spaCy models."
-    script:
-      - "python -m spacy download en_core_web_lg"
-      - "python -m spacy download en_core_web_trf"
 
 
   - name: "train-ner"
@@ -94,6 +80,7 @@ commands:
         --system.seed ${vars.seed}
         --gpu-id ${vars.gpu}
 
+  
   - name: "find-threshold"
     help: "Find classifier threshold for spancat."
     script:
