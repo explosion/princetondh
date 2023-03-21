@@ -7,6 +7,12 @@ assets:
       repo: "https://github.com/dbamman/litbank"
       branch: "master"
       path: "entities/brat/"
+  
+  - dest: "assets/events/"
+    git:
+      repo: "https://github.com/dbamman/litbank"
+      branch: "master"
+      path: "events/brat/"
 
 vars:
   train_ratio: 0.8
@@ -31,7 +37,7 @@ workflows:
 
 
 commands:
-  - name: "prepare"
+  - name: "prepare-entities"
     help: "Prepare the LitBank data set for use in spaCy."
     script:
       - >-
@@ -52,6 +58,20 @@ commands:
         python -m spacy debug data configs/spancat.cfg
         --paths.train corpus/entity_spans-train.spacy
         --paths.dev corpus/entity_spans-dev.spacy
+  
+  - name: "prepare-event"
+    help: "Prepare the LitBank data set for use in spaCy."
+    script:
+      - >-
+        python -m scripts.prepare prepare-brat -i assets/events
+        -o corpus/event_spans.spacy -l en -f
+      - >-
+        python -m scripts.prepare spans2tags -i corpus/event_spans.spacy
+        -l en -f -s sc -o corpus/event_tags.spacy
+      - >- 
+        python -m scripts.prepare split -i corpus/event_tags.spacy
+        -t ${vars.train_ratio} -d ${vars.dev_ratio}
+        -l en -se ${vars.seed} --shuffle
 
 
   - name: "train-ner"
@@ -66,7 +86,7 @@ commands:
         --system.seed ${vars.seed}
         --gpu-id ${vars.gpu}
 
-
+  
   - name: "train-spancat"
     help: "Train the default spancat pipeline."
     script:
@@ -101,6 +121,31 @@ commands:
         --paths.vectors en_core_web_lg
         --system.seed ${vars.seed}
         --gpu-id ${vars.gpu}
+  
+
+  - name: "train-tagger"
+    help: "Train the default NER pipeline."
+    script:
+      - >-
+        python -m spacy train
+        configs/tagger.cfg
+        --output training/tagger
+        --paths.train corpus/event_tags-train.spacy
+        --paths.dev corpus/event_tags-dev.spacy
+        --system.seed ${vars.seed}
+        --gpu-id ${vars.gpu}
+        --code scripts/positive_tagger_scorer.py
+
+  - name: "evaluate-tagger-dev"
+    help: "Evaluate Tagger model."
+    script:
+      - >-
+        python -m spacy evaluate
+        training/tagger/model-best
+        corpus/event_tags-dev.spacy
+        --output metrics/tagger_dev.json
+        --gpu-id ${vars.gpu}
+        --code scripts/positive_tagger_scorer.py
 
 
   - name: "evaluate-ner-dev"
