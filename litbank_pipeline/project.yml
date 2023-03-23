@@ -60,7 +60,7 @@ workflows:
 
 commands:
   - name: "prepare-entities"
-    help: "Prepare the LitBank data set for use in spaCy."
+    help: "Prepare the LitBank entities for use in spaCy."
     script:
       - >-
         python -m scripts.prepare prepare-brat -i assets/entities
@@ -93,7 +93,7 @@ commands:
       - corpus/entity_ents-test.spacy
 
   - name: "prepare-event"
-    help: "Prepare the LitBank data set for use in spaCy."
+    help: "Prepare the LitBank events for use in spaCy."
     script:
       - >-
         python -m scripts.prepare prepare-brat -i assets/events
@@ -134,7 +134,7 @@ commands:
 
   
   - name: "train-ner-lstm"
-    help: "Train the default NER pipeline."
+    help: "Train the NER pipeline with an LSTM encoder."
     script:
       - >-
         python -m spacy train
@@ -170,7 +170,7 @@ commands:
       - training/spancat
   
   - name: "train-spancat-lstm"
-    help: "Train the default spancat pipeline."
+    help: "Train the spancat pipeline with an LSTM encoder."
     script:
       - >-
         python -m spacy train
@@ -198,7 +198,7 @@ commands:
       - training/spancat/model-best
 
   - name: "find-threshold-lstm"
-    help: "Find classifier threshold for spancat."
+    help: "Find classifier threshold for the spancat with the LSTM encoder."
     script:
       - >- 
         python -m spacy find-threshold training/spancat_lstm/model-best
@@ -207,7 +207,7 @@ commands:
       - training/spancat_lstm/model-best
 
   - name: "train-spancat-singlelabel"
-    help: "Train the default spancat pipeline."
+    help: "Train the default spancat-singlelabel pipeline."
     script:
       - >-
         python -m spacy train
@@ -225,7 +225,7 @@ commands:
       - training/spancat_singlelabel
   
   - name: "train-spancat-singlelabel-lstm"
-    help: "Train the default spancat pipeline."
+    help: "Train the default spancat-singlelabel pipeline with an LSTM encoder."
     script:
       - >-
         python -m spacy train
@@ -244,7 +244,7 @@ commands:
   
 
   - name: "train-tagger"
-    help: "Train the default NER pipeline."
+    help: "Train the default tagger pipeline."
     script:
       - >-
         python -m spacy train
@@ -263,7 +263,7 @@ commands:
       - training/tagger
   
   - name: "train-tagger-lstm"
-    help: "Train the default NER pipeline."
+    help: "Train the default tagger pipeline with an LSTM encoder."
     script:
       - >-
         python -m spacy train
@@ -282,7 +282,7 @@ commands:
       - training/tagger_lstm
 
   - name: "evaluate-tagger-dev"
-    help: "Evaluate Tagger model."
+    help: "Evaluate the default tagger pipeline on the development set."
     script:
       - >-
         python -m spacy evaluate
@@ -298,7 +298,7 @@ commands:
       - metrics/tagger_dev.json
   
   - name: "evaluate-tagger-test"
-    help: "Evaluate Tagger model."
+    help: "Evaluate the default tagger pipeline on the test set."
     script:
       - >-
         python -m spacy evaluate
@@ -315,7 +315,7 @@ commands:
   
 
   - name: "evaluate-tagger-lstm-dev"
-    help: "Evaluate Tagger model."
+    help: "Evaluate the tagger pipeline with a BiLSTM encoder on the development set."
     script:
       - >-
         python -m spacy evaluate
@@ -331,7 +331,7 @@ commands:
       - metrics/tagger_dev.json
   
   - name: "evaluate-tagger-lstm-test"
-    help: "Evaluate Tagger model."
+    help: "Evaluate the tagger pipeline with a BiLSTM encoder on the test set."
     script:
       - >-
         python -m spacy evaluate
@@ -348,7 +348,7 @@ commands:
 
 
   - name: "evaluate-ner-dev"
-    help: "Evaluate NER model."
+    help: "Evaluate the default NER pipeline on the development set."
     script:
       - >-
         python -m spacy evaluate
@@ -364,7 +364,7 @@ commands:
 
 
   - name: "evaluate-ner-test"
-    help: "Evaluate NER model."
+    help: "Evaluate the default NER pipeline on the test set."
     script:
       - >-
         python -m spacy evaluate
@@ -379,7 +379,7 @@ commands:
       - metrics/ner_test.json
   
   - name: "evaluate-ner-lstm-dev"
-    help: "Evaluate NER model."
+    help: "Evaluate the NER pipeline a BiLSTM encoder on the development set."
     script:
       - >-
         python -m spacy evaluate
@@ -395,7 +395,7 @@ commands:
 
 
   - name: "evaluate-ner-lstm-test"
-    help: "Evaluate NER model."
+    help: "Evaluate the NER pipeline with a BiLSTM encoder on the test set."
     script:
       - >-
         python -m spacy evaluate
@@ -411,7 +411,7 @@ commands:
 
 
   - name: "evaluate-spancat-dev"
-    help: "Evaluate NER model."
+    help: "Evaluate the default spancat model on the development set."
     script:
       - >-
         python -m spacy evaluate
@@ -426,7 +426,7 @@ commands:
       - metrics/spancat_dev.json
 
   - name: "evaluate-spancat-test"
-    help: "Evaluate NER model."
+    help: "Evaluate default spancat pipeline on the test set."
     script:
       - >-
         python -m spacy evaluate
@@ -441,7 +441,7 @@ commands:
       - metrics/spancat_test.json
   
   - name: "evaluate-spancat-lstm-dev"
-    help: "Evaluate NER model."
+    help: "Evaluate the spancat pipeline with a BiLSTM encoder on the development set."
     script:
       - >-
         python -m spacy evaluate
@@ -457,7 +457,7 @@ commands:
 
 
   - name: "evaluate-spancat-lstm-test"
-    help: "Evaluate NER model."
+    help: "Evaluate spancat model with a BiLSTM encoder on the test set."
     script:
       - >-
         python -m spacy evaluate
@@ -473,7 +473,7 @@ commands:
 
 
   - name: "evaluate-spancat-singlelabel-dev"
-    help: "Evaluate NER model."
+    help: "Evaluate the default spancat-singlelabel pipeline on the development set."
     script:
       - >-
         python -m spacy evaluate
@@ -489,7 +489,7 @@ commands:
   
 
   - name: "evaluate-spancat-singlelabel-test"
-    help: "Evaluate NER model."
+    help: "Evaluate the default spancat-singlelabel pipeline on the test set."
     script:
       - >-
         python -m spacy evaluate
@@ -504,7 +504,7 @@ commands:
       - metrics/spancat_singlelabel_test.json
   
   - name: "evaluate-spancat-singlelabel-lstm-dev"
-    help: "Evaluate NER model."
+    help: "Evaluate the spancat-singlelabel pipeline with a BiLSTM encoder on the development set."
     script:
       - >-
         python -m spacy evaluate
@@ -520,7 +520,7 @@ commands:
 
 
   - name: "evaluate-spancat-singlelabel-lstm-test"
-    help: "Evaluate NER model."
+    help: "Evaluate the spancat-singlelabel pipeline with a BiLSTM encoder on the test set."
     script:
       - >-
         python -m spacy evaluate
