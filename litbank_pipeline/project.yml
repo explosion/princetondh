@@ -17,7 +17,7 @@ assets:
 vars:
   train_ratio: 0.8
   dev_ratio: 0.1
-  seed: 833
+  seed: 83
   gpu: 0
 
 
@@ -26,14 +26,34 @@ workflows:
   ner:
     - "train-ner"
     - "evaluate-ner-test"
+  
+  ner-lstm:
+    - "train-ner-lstm"
+    - "evaluate-ner-lstm-test"
 
   spancat:
     - "train-spancat"
     - "evaluate-spancat-test"
+  
+  spancat-lstm:
+    - "train-spancat-lstm"
+    - "evaluate-spancat-lstm-test"
 
   spancat-singlelabel:
     - "train-spancat-singlelabel"
     - "evaluate-spancat-singlelabel-test"
+  
+  spancat-singlelabel-lstm:
+    - "train-spancat-singlelabel-lstm"
+    - "evaluate-spancat-singlelabel-lstm-test"
+
+  tagger:
+    - "train-tagger"
+    - "evaluate-tagger-test"
+  
+  tagger-lstm:
+    - "train-tagger-lstm"
+    - "evaluate-tagger-lstm-test"
 
 
 commands:
@@ -85,6 +105,18 @@ commands:
         --paths.dev corpus/entity_ents-dev.spacy
         --system.seed ${vars.seed}
         --gpu-id ${vars.gpu}
+  
+  - name: "train-ner-lstm"
+    help: "Train the default NER pipeline."
+    script:
+      - >-
+        python -m spacy train
+        configs/ner_lstm.cfg
+        --output training/ner_lstm
+        --paths.train corpus/entity_ents-train.spacy
+        --paths.dev corpus/entity_ents-dev.spacy
+        --system.seed ${vars.seed}
+        --gpu-id ${vars.gpu}
 
   
   - name: "train-spancat"
@@ -94,6 +126,19 @@ commands:
         python -m spacy train
         configs/spancat.cfg
         --output training/spancat
+        --paths.train corpus/entity_spans-train.spacy
+        --paths.dev corpus/entity_spans-dev.spacy
+        --paths.vectors en_core_web_lg
+        --system.seed ${vars.seed}
+        --gpu-id ${vars.gpu}
+  
+  - name: "train-spancat-lstm"
+    help: "Train the default spancat pipeline."
+    script:
+      - >-
+        python -m spacy train
+        configs/spancat_lstm.cfg
+        --output training/spancat_lstm
         --paths.train corpus/entity_spans-train.spacy
         --paths.dev corpus/entity_spans-dev.spacy
         --paths.vectors en_core_web_lg
@@ -122,6 +167,19 @@ commands:
         --system.seed ${vars.seed}
         --gpu-id ${vars.gpu}
   
+  - name: "train-spancat-singlelabel-lstm"
+    help: "Train the default spancat pipeline."
+    script:
+      - >-
+        python -m spacy train
+        configs/spancat_singlelabel_lstm.cfg
+        --output training/spancat_singlelabel_lstm
+        --paths.train corpus/entity_spans-train.spacy
+        --paths.dev corpus/entity_spans-dev.spacy
+        --paths.vectors en_core_web_lg
+        --system.seed ${vars.seed}
+        --gpu-id ${vars.gpu}
+  
 
   - name: "train-tagger"
     help: "Train the default NER pipeline."
@@ -135,6 +193,7 @@ commands:
         --system.seed ${vars.seed}
         --gpu-id ${vars.gpu}
         --code scripts/positive_tagger_scorer.py
+        --paths.vectors en_core_web_lg
 
   - name: "evaluate-tagger-dev"
     help: "Evaluate Tagger model."
@@ -144,6 +203,53 @@ commands:
         training/tagger/model-best
         corpus/event_tags-dev.spacy
         --output metrics/tagger_dev.json
+        --gpu-id ${vars.gpu}
+        --code scripts/positive_tagger_scorer.py
+  
+  - name: "evaluate-tagger-test"
+    help: "Evaluate Tagger model."
+    script:
+      - >-
+        python -m spacy evaluate
+        training/tagger/model-best
+        corpus/event_tags-test.spacy
+        --output metrics/tagger_test.json
+        --gpu-id ${vars.gpu}
+        --code scripts/positive_tagger_scorer.py
+  
+  - name: "train-tagger-lstm"
+    help: "Train the default NER pipeline."
+    script:
+      - >-
+        python -m spacy train
+        configs/tagger_lstm.cfg
+        --output training/tagger_lstm
+        --paths.train corpus/event_tags-train.spacy
+        --paths.dev corpus/event_tags-dev.spacy
+        --system.seed ${vars.seed}
+        --gpu-id ${vars.gpu}
+        --code scripts/positive_tagger_scorer.py
+        --paths.vectors en_core_web_lg
+
+  - name: "evaluate-tagger-lstm-dev"
+    help: "Evaluate Tagger model."
+    script:
+      - >-
+        python -m spacy evaluate
+        training/tagger_lstm/model-best
+        corpus/event_tags-dev.spacy
+        --output metrics/tagger_lstm_dev.json
+        --gpu-id ${vars.gpu}
+        --code scripts/positive_tagger_scorer.py
+  
+  - name: "evaluate-tagger-lstm-test"
+    help: "Evaluate Tagger model."
+    script:
+      - >-
+        python -m spacy evaluate
+        training/tagger_lstm/model-best
+        corpus/event_tags-test.spacy
+        --output metrics/tagger_lstm_test.json
         --gpu-id ${vars.gpu}
         --code scripts/positive_tagger_scorer.py
 
@@ -168,6 +274,27 @@ commands:
         corpus/entity_ents-test.spacy
         --output metrics/ner_test.json
         --gpu-id ${vars.gpu}
+  
+  - name: "evaluate-ner-lstm-dev"
+    help: "Evaluate NER model."
+    script:
+      - >-
+        python -m spacy evaluate
+        training/ner_lstm/model-best
+        corpus/entity_ents-dev.spacy
+        --output metrics/ner_lstm_dev.json
+        --gpu-id ${vars.gpu}
+
+
+  - name: "evaluate-ner-lstm-test"
+    help: "Evaluate NER model."
+    script:
+      - >-
+        python -m spacy evaluate
+        training/ner_lstm/model-best
+        corpus/entity_ents-test.spacy
+        --output metrics/ner_lstm_test.json
+        --gpu-id ${vars.gpu}
 
 
   - name: "evaluate-spancat-dev"
@@ -190,6 +317,27 @@ commands:
         corpus/entity_spans-test.spacy
         --output metrics/spancat_test.json
         --gpu-id ${vars.gpu}
+  
+  - name: "evaluate-spancat-lstm-dev"
+    help: "Evaluate NER model."
+    script:
+      - >-
+        python -m spacy evaluate
+        training/spancat_lstm/model-best
+        corpus/entity_spans-dev.spacy
+        --output metrics/spancat_lstm_dev.json
+        --gpu-id ${vars.gpu}
+
+
+  - name: "evaluate-spancat-lstm-test"
+    help: "Evaluate NER model."
+    script:
+      - >-
+        python -m spacy evaluate
+        training/spancat_lstm/model-best
+        corpus/entity_spans-test.spacy
+        --output metrics/spancat_lstm_test.json
+        --gpu-id ${vars.gpu}
 
 
   - name: "evaluate-spancat-singlelabel-dev"
@@ -197,11 +345,11 @@ commands:
     script:
       - >-
         python -m spacy evaluate
-        training/spancat/model-best
+        training/spancat_singlelabel/model-best
         corpus/entity_spans-dev.spacy
-        --output metrics/spancat_dev.json
+        --output metrics/spancat_singlelabel_dev.json
         --gpu-id ${vars.gpu}
-
+  
 
   - name: "evaluate-spancat-singlelabel-test"
     help: "Evaluate NER model."
@@ -210,5 +358,26 @@ commands:
         python -m spacy evaluate
         training/spancat_singlelabel/model-best
         corpus/entity_spans-test.spacy
-        --output metrics/spancat_test.json
+        --output metrics/spancat_singlelabel_test.json
+        --gpu-id ${vars.gpu}
+  
+  - name: "evaluate-spancat-singlelabel-lstm-dev"
+    help: "Evaluate NER model."
+    script:
+      - >-
+        python -m spacy evaluate
+        training/spancat_singlelabel_lstm/model-best
+        corpus/entity_spans-dev.spacy
+        --output metrics/spancat_singlelabel_lstm_dev.json
+        --gpu-id ${vars.gpu}
+
+
+  - name: "evaluate-spancat-singlelabel-lstm-test"
+    help: "Evaluate NER model."
+    script:
+      - >-
+        python -m spacy evaluate
+        training/spancat_singlelabel_lstm/model-best
+        corpus/entity_spans-test.spacy
+        --output metrics/spancat_singlelabel_lstm_test.json
         --gpu-id ${vars.gpu}
