@@ -12,15 +12,15 @@ def score_positive_tagger(
     missing_values: Set[Any] = MISSING_VALUES,  # type: ignore[assignment]
     **cfg,
 ) -> Dict[str, Any]:
-    """Returns an accuracy score for token level positive class.
+    """Returns an accuracy score for token level classification
+    only for the positive class.
+    Modified from spacy.scorer.Scorer.score_token_attr.
 
     examples (Iterable[Example]): Examples to score
     missing_values (Set[Any]): Attribute values to treat as missing annotation
         in the reference annotation.
     RETURNS (Dict[str, Any]): A dictionary containing the accuracy score
         under the key attr_acc.
-
-    DOCS: https://spacy.io/api/scorer#score_token_attr
     """
     tag_score = PRFScore()
     for example in examples:
@@ -52,7 +52,7 @@ def score_positive_tagger(
 
 
 @registry.scorers("spacy.positive_tagger_scorer.v1")
-def make_scorer(positive: str):
-    def closure(examples, **kwargs):
+def make_positive_scorer(positive: str):
+    def positive_scorer(examples, **kwargs):
         return score_positive_tagger(examples, positive, **kwargs)
-    return closure
+    return positive_scorer
