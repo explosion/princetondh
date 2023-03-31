@@ -24,6 +24,12 @@ def _train_dev_test_split(
     shuffle: Optional[bool] = False,
     seed: Optional[int] = None,
 ) -> Tuple[List[Any], List[Any], List[Any]]:
+    """
+    Split data into training, development and test portions.
+    If 'shuffle' is true then create a random split. The
+    number of samples in each portion is controlled by the
+    'train_ratio' and 'dev_ratio' parameters.
+    """
     if shuffle:
         if not seed:
             raise ValueError("Must provide 'seed' when 'shuffle = True'")
@@ -44,8 +50,7 @@ def _train_dev_test_split(
     "prepare-brat",
     input_dir=Arg("--input-dir", "-i", help="Path to .txt and .ann files."),
     output_file=Arg("--output-file", "-o", help="Path to write .spacy file."),
-    lang=Arg("-lang", "-l", help="Language of the dataset"),
-    # FIXME how to make it optional?!
+    lang=Arg("--lang", "-l", help="Language of the dataset"),
     force=Arg("--force", "-f", help="Force overwrite output_file if exists.")
 )
 def prepare_brat(
@@ -58,13 +63,26 @@ def prepare_brat(
     nlp = spacy.blank(lang)
     input_dir = ensure_path(input_dir)
     output_file = ensure_path(output_file)
-    if not input_dir.is_dir():
-        raise ValueError("MESSAGE")
     if not input_dir.exists():
-        raise ValueError("MESSAGE")
+        msg.warn(f"Could not find {input_dir}.", exits=1)
+    if not input_dir.is_dir():
+        raise msg.warn("'input_dir' must be a directory.", exits=1)
     if output_file.exists() and not force:
-        raise ValueError("MESSAGE")
+        raise msg.warn(
+            f"{output_file} already exists. "
+            "Use the -f or --force option to overwrite it.",
+            exits=1
+        )
+    if output_file.is_dir():
+        raise msg.warn("'output_file' cannot be a directory.", exits=1)
+    documents = 0
     for path in input_dir.iterdir():
+        if path.suffix not in [".ann", ".txt"]:
+            msg.warn(
+                "Does not seem to be a brat annotation directory. "
+                "Make sure directory only contains .ann and .txt files.",
+                exits=1
+            )
         if path.suffix == ".txt":
             text = path.read_text(encoding="utf8")
             ann_path = (input_dir / (path.stem + '.ann'))
@@ -85,7 +103,9 @@ def prepare_brat(
 
             doc.spans["sc"] = spans
             docbin.add(doc)
+            documents += 1
     docbin.to_disk(output_file)
+    msg.good(f"Found {documents} and written DocBin to {output_file}")
 
 
 @cli.command(
@@ -107,10 +127,31 @@ def split(
 ) -> None:
     input_file = ensure_path(input_file)
     if input_file.is_dir():
-        raise ValueError("MESSAGE")
+        raise msg.warn(
+            "'input_file' should be a file not a directory.", exits=1
+        )
     if not input_file.exists():
-        raise ValueError("MESSAGE")
-    # TODO check train_ratio and dev_ratio input args.
+        raise msg.warn(f"Could not find {input_file}.", exits=1)
+    if not (0 < train_ratio < 1.0):
+        raise msg.warn(
+            f"'train_ratio' has to be between "
+            f"0.0 and 1.0, but found {train_ratio}.",
+            exits=1
+        )
+    if not (0 < dev_ratio < 1.0):
+        raise msg.warn(
+            f"'dev_ratio' has to be between "
+            f"0.0 and 1.0, but found {dev_ratio}.",
+            exits=1
+        )
+    if not (train_ratio + dev_ratio < 1.0):
+        raise msg.warn(
+            "The sum of 'train_ratio' has to be less than 1.0 "
+            "to leave room for the test set. "
+            f"Found `train_ratio`: {train_ratio} and `dev_ratio`: {dev_ratio} "
+            f"whose sum is {train_ratio + dev_ratio}.",
+            exits=1
+        )
     nlp = spacy.blank(lang)
     db = DocBin().from_disk(input_file)
     docs = list(db.get_docs(nlp.vocab))
@@ -148,12 +189,18 @@ def spans2ents(
 ) -> None:
     input_file = ensure_path(input_file)
     output_file = ensure_path(output_file)
-    if input_file.is_dir():
-        raise ValueError("MESSAGE")
     if not input_file.exists():
         msg.warn(f"Could not find {input_file}.", exits=1)
+    if input_file.is_dir():
+        raise msg.warn(
+            "'input_dir' should be a file not a directory.", exits=1
+        )
     if not output_file.exists() and not force:
-        raise ValueError("MESSAGE")
+        raise msg.warn(
+            f"{output_file} already exists. "
+            "Use the -f or --force option to overwrite it.",
+            exits=1
+        )
     nlp = spacy.blank(lang)
     db = DocBin().from_disk(input_file)
     newdb = DocBin()
@@ -191,12 +238,18 @@ def spans2tags(
 ) -> None:
     input_file = ensure_path(input_file)
     output_file = ensure_path(output_file)
-    if input_file.is_dir():
-        raise ValueError("MESSAGE")
     if not input_file.exists():
         msg.warn(f"Could not find {input_file}.", exits=1)
+    if input_file.is_dir():
+        raise msg.warn(
+            "'input_dir' should be a file not a directory.", exits=1
+        )
     if not output_file.exists() and not force:
-        raise ValueError("MESSAGE")
+        raise msg.warn(
+            f"{output_file} already exists. "
+            "Use the -f or --force option to overwrite it.",
+            exits=1
+        )
     nlp = spacy.blank(lang)
     db = DocBin().from_disk(input_file)
     newdb = DocBin()
