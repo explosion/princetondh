@@ -42,7 +42,7 @@ The commands to preprocess are in
 [`litbank_pipeline/scripts/prepare.py`](litbank_pipeline/scripts/prepare.py). 
 For the event trigger detection we wrote a special scoring function that computes the
 precision, recall and F1 score only for the positive class i.e. the tokens that
-have `EVENT` label. You can find the scorer in [`litbank_pipeline/scripts/positive_tagger_scorer.py`](litbank_pipeline/scripts/positive_tagger_scorer).
+have `EVENT` label. You can find the scorer in [`litbank_pipeline/scripts/positive_tagger_scorer.py`](litbank_pipeline/scripts/positive_tagger_scorer.py).
 
 
 
