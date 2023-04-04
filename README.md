@@ -29,4 +29,4 @@ annotations. To learn about the entity annotations please checkout
 and [this one](https://aclanthology.org/P19-1353.pdf) for the event annotations.
 
 All config files in `litbank_pipeline/configs` project were generated with an appropriate 
-`python -m spacy [init config](https://spacy.io/api/cli#init-config)` command.
+[`init config`](https://spacy.io/api/cli#init-config) command.
