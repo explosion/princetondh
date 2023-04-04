@@ -11,9 +11,9 @@ had a good time and for the rest we hope you'll find this repository useful!
 
 The [`notebooks`](notebooks) directory has three Jupyter notebooks:
 
-1. `intro_to_spacy.ipynb` is a short introduction to how to work with spaCy and a whirlwind tour of many of the tools spaCy provides.
-2. `casestudy_1.ipynb` walks through building a pipeline to extract information from restaurant reviews by identifying spans of interest such as mentions of cuisines or ratings. The pipeline is a blend of rule-based and learning-based techniques and there is an excersize to build your own rules.
-3. `casestudy_2.ipynb` focuses only on learned pipelines and the various tools spaCy provides to find spans in texts. It runs some parts of the `litbank_pipeline` project.
+1. [`intro_to_spacy.ipynb`](notebooks/intro_to_spacy.ipynb) is a short introduction to how to work with spaCy and a whirlwind tour of many of the tools spaCy provides.
+2. [`casestudy_1.ipynb`](notebooks/casestudy_1.ipynb) walks through building a pipeline to extract information from restaurant reviews by identifying spans of interest such as mentions of cuisines or ratings. The pipeline is a blend of rule-based and learning-based techniques and there is an excersize to build your own rules.
+3. [`casestudy_2.ipynb`](notebooks/casestudy_2.ipynb) focuses only on learned pipelines and the various tools spaCy provides to find spans in texts. It runs some parts of the `litbank_pipeline` project.
 
 
 ## LitBank pipeline
