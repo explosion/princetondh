@@ -34,11 +34,20 @@ annotations. To learn about the entity annotations please checkout
 [this paper](https://people.ischool.berkeley.edu/~dbamman/pubs/pdf/naacl2019_literary_entities.pdf) 
 and [this one](https://aclanthology.org/P19-1353.pdf) for the event annotations.
 
-Most config files in `litbank_pipeline/configs` project were generated with an appropriate 
+Most config files in [`litbank_pipeline/configs`](litbank_pipeline/configs) project
+were generated with an appropriate 
 [`init config`](https://spacy.io/api/cli#init-config) command.  
 
+The commands to preprocess are in 
+[`litbank_pipeline/scripts/prepare.py`](litbank_pipeline/scripts/prepare.py). 
+For the event trigger detection we wrote a special scoring function that computes the
+precision, recall and F1 score only for the positive class i.e. the tokens that
+have `EVENT` label. You can find the scorer in [`litbank_pipeline/scripts/positive_tagger_scorer.py`](litbank_pipeline/scripts/positive_tagger_scorer).
+
+
+
 For the named entity recognition tasks there are config files to train
-[`ner`](https://spacy.io/api/entityrecognizer), [`spancat` or `spancat_singlelable`](https://spacy.io/api/spancategorizer) components with either the default 
+[`ner`](https://spacy.io/api/entityrecognizer), [`spancat` or `spancat_singlelabel`](https://spacy.io/api/spancategorizer) components with either the default 
 [Convolutional Network](https://spacy.io/api/architectures#MaxoutWindowEncoder)
 or a [Recurrent Network](https://spacy.io/api/architectures#TorchBiLSTMEncoder) encoder.
 
