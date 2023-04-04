@@ -64,4 +64,3 @@ To learn more about shared `tok2vec` layers please checkout: https://spacy.io/us
 
 - [An annotated dataset of literary entities](https://aclanthology.org/N19-1220) (Bamman et al., NAACL 2019)
 - [Literary Event Detection](https://aclanthology.org/P19-1353) (Sims et al., ACL 2019)
-- [Blogpost on `spancat` and its comparison to `ner`](https://explosion.ai/blog/spancat)
