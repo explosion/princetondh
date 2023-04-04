@@ -9,7 +9,7 @@ had a good time and for the rest we hope you'll find this repository useful!
 
 ## Notebooks
 
-The `notebooks` directory has three Jupyter notebooks:
+The [`notebooks`](notebooks) directory has three Jupyter notebooks:
 
 1. `intro_to_spacy.ipynb` is a short introduction to how to work with spaCy and a whirlwind tour of many of the tools spaCy provides.
 2. `casestudy_1.ipynb` walks through building a pipeline to extract information from restaurant reviews by identifying spans of interest such as mentions of cuisines or ratings. The pipeline is a blend of rule-based and learning-based techniques and there is an excersize to build your own rules.
