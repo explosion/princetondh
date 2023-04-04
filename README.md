@@ -48,7 +48,16 @@ much more efficient than `spancat`, but `spancat` is more flexible. For a compar
 the to checkout this [blogpost](https://explosion.ai/blog/spancat).
 
 
+## Homework
 
+As an excersize to get more familiar with spaCy we recommend training the different
+architectures with the different encoders and see how they compare in terms of accuracy, speend
+and the kinds of mistakes they make.  
+
+We also think it would be a useful excersize to train a pipeline that has a single
+`tok2vec` component providing representations both to a `tagger` component for the
+event detection and a `ner` or `spancat` or `spancat_singlelabel` component for entity recognition.
+To learn more about shared `tok2vec` layers please checkout: https://spacy.io/usage/embeddings-transformers#embedding-layers.
 
 
 ## References
