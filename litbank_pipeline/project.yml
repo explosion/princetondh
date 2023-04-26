@@ -40,6 +40,10 @@ workflows:
   spancat-lstm:
     - "train-spancat-lstm"
     - "evaluate-spancat-lstm-test"
+  
+  spancat-trf:
+    - "train-spancat-trf"
+    - "evaluate-spancat-trf-test"
 
   spancat-singlelabel:
     - "train-spancat-singlelabel"
@@ -186,6 +190,24 @@ commands:
       - corpus/entity_spans-dev.spacy
     outputs:
       - training/spancat_lstm
+ 
+  - name: "train-spancat-trf"
+    help: "Train the spancat pipeline with an transformer encoder."
+    script:
+      - >-
+        python -m spacy train
+        configs/spancat_trf.cfg
+        --output training/spancat_trf
+        --paths.train corpus/entity_spans-train.spacy
+        --paths.dev corpus/entity_spans-dev.spacy
+        --paths.vectors en_core_web_lg
+        --system.seed ${vars.seed}
+        --gpu-id ${vars.gpu}
+    deps:
+      - corpus/entity_spans-train.spacy
+      - corpus/entity_spans-dev.spacy
+    outputs:
+      - training/spancat_trf
 
   
   - name: "find-threshold"
@@ -471,6 +493,36 @@ commands:
     outputs:
       - metrics/spancat_lstm_test.json
 
+  - name: "evaluate-spancat-trf-dev"
+    help: "Evaluate the spancat pipeline with transformer encoder on the development set."
+    script:
+      - >-
+        python -m spacy evaluate
+        training/spancat_trf/model-best
+        corpus/entity_spans-dev.spacy
+        --output metrics/spancat_trf_dev.json
+        --gpu-id ${vars.gpu}
+    deps:
+      - training/spancat_lstm/model-best
+      - corpus/entity_spans-dev.spacy
+    outputs:
+      - metrics/spancat_trf_dev.json
+
+
+  - name: "evaluate-spancat-trf-test"
+    help: "Evaluate spancat model with a transformer encoder on the test set."
+    script:
+      - >-
+        python -m spacy evaluate
+        training/spancat_trf/model-best
+        corpus/entity_spans-test.spacy
+        --output metrics/spancat_trf_test.json
+        --gpu-id ${vars.gpu}
+    deps:
+      - training/spancat_trf/model-best
+      - corpus/entity_spans-test.spacy
+    outputs:
+      - metrics/spancat_trf_test.json
 
   - name: "evaluate-spancat-singlelabel-dev"
     help: "Evaluate the default spancat-singlelabel pipeline on the development set."
